@@ -1,6 +1,6 @@
-use crate::daterange::default_date_range::DefaultDateRange;
+use crate::daterange::DefaultDateRange;
 use crate::daterange::DateRange;
-use crate::util::date_utils::{add_years, subtract_years};
+use crate::dateutils::{add_years, subtract_years};
 use chrono::{Duration, NaiveDate};
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]

@@ -1,6 +1,6 @@
 use chrono::{Datelike, Duration, NaiveDate, Weekday};
 use crate::daterange::DateRange;
-use crate::daterange::default_date_range::DefaultDateRange;
+use crate::daterange::DefaultDateRange;
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct BiWeeklyDateRange(DefaultDateRange);

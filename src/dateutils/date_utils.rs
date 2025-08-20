@@ -1,4 +1,7 @@
-use chrono::{Datelike, Duration, NaiveDate};
+use std::cmp::{max, min};
+use bigdecimal::BigDecimal;
+use chrono::{Datelike, Duration, NaiveDate, NaiveDateTime};
+use num_traits::FromPrimitive;
 
 /// Get the first day of the month for the given date.
 pub fn first_day_of_month(date: NaiveDate) -> NaiveDate {
@@ -52,6 +55,99 @@ pub fn add_years(date: NaiveDate, years: i32) -> NaiveDate {
 /// Subtract `years` from a date.
 pub fn subtract_years(date: NaiveDate, years: i32) -> NaiveDate {
     subtract_months(date, years * 12)
+}
+
+/// Return the earlier of two NaiveDateTime values.
+/// If equal, returns time1.
+pub fn earliest(time1: NaiveDateTime, time2: NaiveDateTime) -> NaiveDateTime {
+    min(time1, time2)
+}
+
+/// Return the earlier of two optional NaiveDateTime values.
+/// If one is None, returns the other. If both are None, returns None.
+/// If equal, returns time1.
+pub fn earliest_opt(time1: Option<NaiveDateTime>, time2: Option<NaiveDateTime>) -> Option<NaiveDateTime> {
+    match (time1, time2) {
+        (None, None) => None,
+        (Some(t1), None) => Some(t1),
+        (None, Some(t2)) => Some(t2),
+        (Some(t1), Some(t2)) => Some(if t1 <= t2 { t1 } else { t2 }),
+    }
+}
+
+/// Return the latter of two NaiveDateTime values.
+/// If equal, returns time1.
+pub fn latest(time1: NaiveDateTime, time2: NaiveDateTime) -> NaiveDateTime {
+    max(time1, time2)
+}
+
+/// Return the latter of two optional NaiveDateTime values.
+/// - If one is None, returns the other.
+/// - If both are None, returns None.
+/// - If equal, returns time1 (mirrors Java's compareTo >= behavior).
+pub fn latest_opt(time1: Option<NaiveDateTime>, time2: Option<NaiveDateTime>) -> Option<NaiveDateTime> {
+    match (time1, time2) {
+        (None, None) => None,
+        (Some(t1), None) => Some(t1),
+        (None, Some(t2)) => Some(t2),
+        (Some(t1), Some(t2)) => Some(if t1 >= t2 { t1 } else { t2 }),
+    }
+}
+
+/// Returns whole hours between start and end (truncating toward zero).
+pub fn duration_in_hours(start: NaiveDateTime, end: NaiveDateTime) -> i32 {
+    let seconds = (end - start).num_seconds();
+    (seconds as i32) / 3_600
+}
+
+/// Returns whole minutes between start and end (truncating toward zero).
+pub fn duration_in_minutes(start: NaiveDateTime, end: NaiveDateTime) -> i32 {
+    let seconds = (end - start).num_seconds();
+    (seconds as i32) / 60
+}
+
+/// Returns whole seconds between start and end (truncating toward zero).
+pub fn duration_in_seconds(start: NaiveDateTime, end: NaiveDateTime) -> i32 {
+    (end - start).num_seconds() as i32
+}
+
+/// Returns duration between start and end as fractional seconds,
+/// rounded to 4 significant digits (similar to Java BigDecimal with MathContext(4)).
+pub fn duration_in_fractional_seconds(start: NaiveDateTime, end: NaiveDateTime) -> f64 {
+    let seconds = (end - start).num_milliseconds() as f64 / 1_000.0;
+    round_to_sig_figs(seconds, 4)
+}
+
+/// Returns duration between start and end as fractional hours.
+pub fn duration_in_fractional_hours(start: NaiveDateTime, end: NaiveDateTime) -> f64 {
+    (end - start).num_seconds() as f64 / 3_600.0
+}
+
+/// Round a floating-point value to the given number of significant figures.
+fn round_to_sig_figs(value: f64, sig_figs: u32) -> f64 {
+    if value == 0.0 {
+        return 0.0;
+    }
+    let abs = value.abs();
+    let order = abs.log10().floor();
+    let scale = 10f64.powf((sig_figs as f64 - 1.0) - order);
+    (value * scale).round() / scale
+}
+
+/// Returns duration between start and end as fractional seconds (BigDecimal).
+/// Computed exactly from milliseconds: seconds = millis / 1000.
+pub fn duration_in_fractional_seconds_bd(start: NaiveDateTime, end: NaiveDateTime) -> BigDecimal {
+    let millis = (end - start).num_milliseconds();
+    let ms_bd = BigDecimal::from_i64(millis).unwrap();
+    ms_bd / BigDecimal::from(1_000i32)
+}
+
+/// Returns duration between start and end as fractional hours (BigDecimal).
+/// Computed from whole seconds: hours = seconds / 3600.
+pub fn duration_in_fractional_hours_bd(start: NaiveDateTime, end: NaiveDateTime) -> BigDecimal {
+    let secs = (end - start).num_seconds();
+    let sec_bd = BigDecimal::from_i64(secs).unwrap();
+    sec_bd / BigDecimal::from(3_600i32)
 }
 
 #[cfg(test)]

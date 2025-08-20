@@ -51,8 +51,8 @@ mod tests {
 
     #[test]
     fn test_multi_date_range() {
-        let start = NaiveDate::from_ymd(2025, 8, 1);
-        let end = NaiveDate::from_ymd(2025, 8, 15);
+        let start = NaiveDate::from_ymd_opt(2025, 8, 1).unwrap();
+        let end = NaiveDate::from_ymd_opt(2025, 8, 15).unwrap();
         let range = ArbitraryDateRange::of(start, end);
 
         assert_eq!(range.start_date(), start);
@@ -60,7 +60,7 @@ mod tests {
         assert_eq!(range.len(), 15);
         assert!(range.contains_date(start));
         assert!(range.contains_date(end));
-        assert!(!range.contains_date(NaiveDate::from_ymd(2025, 7, 31)));
+        assert!(!range.contains_date(NaiveDate::from_ymd_opt(2025, 7, 31).unwrap()));
 
         let dates = range.dates();
         assert_eq!(dates.first().unwrap(), &start);
@@ -69,8 +69,8 @@ mod tests {
 
     #[test]
     fn test_prior_and_next() {
-        let start = NaiveDate::from_ymd(2025, 8, 1);
-        let end = NaiveDate::from_ymd(2025, 8, 5);
+        let start = NaiveDate::from_ymd_opt(2025, 8, 1).unwrap();
+        let end = NaiveDate::from_ymd_opt(2025, 8, 5).unwrap();
         let range = ArbitraryDateRange::of(start, end);
 
         let prior = range.prior();
@@ -84,8 +84,8 @@ mod tests {
 
     #[test]
     fn test_ranges_before_after() {
-        let start = NaiveDate::from_ymd(2025, 8, 1);
-        let end = NaiveDate::from_ymd(2025, 8, 3);
+        let start = NaiveDate::from_ymd_opt(2025, 8, 1).unwrap();
+        let end = NaiveDate::from_ymd_opt(2025, 8, 3).unwrap();
         let range = ArbitraryDateRange::of(start, end);
 
         let before = range.ranges_before(2);

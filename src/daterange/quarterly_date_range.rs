@@ -1,6 +1,6 @@
 use crate::daterange::DateRange;
 use crate::daterange::DefaultDateRange;
-use crate::util::date_utils::{add_months, first_day_of_month, last_day_of_month, subtract_months};
+use crate::dateutils::{add_months, first_day_of_month, last_day_of_month, subtract_months};
 use chrono::NaiveDate;
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]

@@ -1,44 +1,24 @@
-use chrono::{Datelike, Duration, NaiveDate, Weekday};
 use crate::daterange::DateRange;
-use crate::daterange::DefaultDateRange;
+use chrono::{Datelike, Duration, NaiveDate, Weekday};
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct WeeklyDateRange(DefaultDateRange);
+pub struct WeeklyDateRange;
 
 impl WeeklyDateRange {
-    pub fn with_start_date(start_date: NaiveDate) -> Self {
+    pub fn with_start_date(start_date: NaiveDate) -> DateRange {
         let end = start_date + Duration::days(6);
-        Self(DefaultDateRange::new(start_date, end))
+        DateRange::new(start_date, end)
     }
 
-    pub fn with_end_date(end_date: NaiveDate) -> Self {
+    pub fn with_end_date(end_date: NaiveDate) -> DateRange {
         let start = end_date - Duration::days(6);
-        Self(DefaultDateRange::new(start, end_date))
+        DateRange::new(start, end_date)
     }
 
-    pub fn with_target_date(target: NaiveDate, end_day: Weekday) -> Self {
+    pub fn with_target_date(target: NaiveDate, end_day: Weekday) -> DateRange {
         let offset = calculate_day_of_week_offset(target, end_day);
         let end = target + Duration::days(offset as i64);
         let start = end - Duration::days(6);
-        Self(DefaultDateRange::new(start, end))
-    }
-}
-
-impl DateRange for WeeklyDateRange {
-    fn start_date(&self) -> NaiveDate {
-        self.0.start_date()
-    }
-
-    fn end_date(&self) -> NaiveDate {
-        self.0.end_date()
-    }
-
-    fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    fn create_new_date_range(&self, start: NaiveDate, end: NaiveDate) -> Self {
-        WeeklyDateRange(DefaultDateRange::new(start, end))
+        DateRange::new(start, end)
     }
 }
 

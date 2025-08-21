@@ -1,51 +1,55 @@
-use crate::daterange::DefaultDateRange;
 use crate::daterange::DateRange;
 use crate::dateutils::{add_months, subtract_months};
 use chrono::{Duration, NaiveDate};
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct SemiAnnualDateRange(DefaultDateRange);
+pub struct SemiAnnualDateRange;
 
 impl SemiAnnualDateRange {
-    pub fn with_start_date(start_date: NaiveDate) -> Self {
-        let end = add_months(start_date, 6) - Duration::days(1);
-        Self(DefaultDateRange::new(start_date, end))
+    pub fn with_start_date(start_date: NaiveDate) -> DateRange {
+        let end_date = add_months(start_date, 6) - Duration::days(1);
+
+        DateRange::new_with_prior_next(
+            start_date,
+            end_date,
+            SemiAnnualDateRange::prior,
+            SemiAnnualDateRange::next,
+        )
     }
 
-    pub fn with_end_date(end_date: NaiveDate) -> Self {
-        let start = subtract_months(end_date, 6) + Duration::days(1);
-        Self(DefaultDateRange::new(start, end_date))
+    pub fn with_end_date(end_date: NaiveDate) -> DateRange {
+        let start_date = subtract_months(end_date, 6) + Duration::days(1);
+
+        DateRange::new_with_prior_next(
+            start_date,
+            end_date,
+            SemiAnnualDateRange::prior,
+            SemiAnnualDateRange::next,
+        )
     }
 
     /// Returns the prior range.
-    pub fn prior(&self) -> Self {
-        let start = subtract_months(self.0.start_date(), 6);
-        let end = subtract_months(self.0.end_date(), 6);
-        Self(DefaultDateRange::new(start, end))
+    pub fn prior(date_range: &DateRange) -> DateRange {
+        let start = subtract_months(date_range.start_date(), 6);
+        let end = subtract_months(date_range.end_date(), 6);
+
+        DateRange::new_with_prior_next(
+            start,
+            end,
+            SemiAnnualDateRange::prior,
+            SemiAnnualDateRange::next,
+        )
     }
 
     /// Returns the next range.
-    pub fn next(&self) -> Self {
-        let start = add_months(self.0.start_date(), 6);
-        let end = add_months(self.0.end_date(), 6);
-        Self(DefaultDateRange::new(start, end))
-    }
-}
+    pub fn next(date_range: &DateRange) -> DateRange {
+        let start = add_months(date_range.start_date(), 6);
+        let end = add_months(date_range.end_date(), 6);
 
-impl DateRange for SemiAnnualDateRange {
-    fn start_date(&self) -> NaiveDate {
-        self.0.start_date()
-    }
-
-    fn end_date(&self) -> NaiveDate {
-        self.0.end_date()
-    }
-
-    fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    fn create_new_date_range(&self, start: NaiveDate, end: NaiveDate) -> Self {
-        SemiAnnualDateRange(DefaultDateRange::new(start, end))
+        DateRange::new_with_prior_next(
+            start,
+            end,
+            SemiAnnualDateRange::prior,
+            SemiAnnualDateRange::next,
+        )
     }
 }

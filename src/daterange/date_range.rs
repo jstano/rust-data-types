@@ -25,7 +25,7 @@ impl DateRange {
         }
     }
 
-    pub fn new_with_prior_next(
+    pub(crate) fn new_with_prior_next(
         start_date: NaiveDate,
         end_date: NaiveDate,
         prior_fn: fn(&DateRange) -> DateRange,
@@ -42,7 +42,7 @@ impl DateRange {
         }
     }
 
-    pub fn new_with_prior_next_start_day(
+    pub(crate) fn new_with_prior_next_start_day(
         start_date: NaiveDate,
         end_date: NaiveDate,
         prior_fn: fn(&DateRange) -> DateRange,

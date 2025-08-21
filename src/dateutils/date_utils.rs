@@ -1,7 +1,7 @@
-use std::cmp::{max, min};
 use bigdecimal::BigDecimal;
 use chrono::{Datelike, Duration, NaiveDate, NaiveDateTime};
 use num_traits::FromPrimitive;
+use std::cmp::{max, min};
 
 /// Get the first day of the month for the given date.
 pub fn first_day_of_month(date: NaiveDate) -> NaiveDate {
@@ -55,6 +55,30 @@ pub fn add_years(date: NaiveDate, years: i32) -> NaiveDate {
 /// Subtract `years` from a date.
 pub fn subtract_years(date: NaiveDate, years: i32) -> NaiveDate {
     subtract_months(date, years * 12)
+}
+
+pub fn with_year_safe(date: NaiveDate, year: i32) -> NaiveDate {
+    let month = date.month();
+    let day = date.day();
+
+    // Check if the day is valid in the new year
+    if let Some(new_date) = NaiveDate::from_ymd_opt(year, month, day) {
+        new_date
+    } else {
+        // If invalid (e.g., Feb 29 on a non-leap year), use the last valid day of the month
+        let last_day = last_day_of_month_year(month, year);
+        NaiveDate::from_ymd_opt(year, month, last_day).unwrap()
+    }
+}
+
+fn last_day_of_month_year(month: u32, year: i32) -> u32 {
+    use chrono::NaiveDate;
+    // Next month, day 0 is the last day of this month
+    let next_month = if month == 12 { 1 } else { month + 1 };
+    let next_month_year = if month == 12 { year + 1 } else { year };
+    NaiveDate::from_ymd_opt(next_month_year, next_month, 1).unwrap()
+        .pred_opt().unwrap()
+        .day()
 }
 
 /// Return the earlier of two NaiveDateTime values.

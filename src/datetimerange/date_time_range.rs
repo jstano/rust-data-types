@@ -1,4 +1,4 @@
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime, Duration};
+use chrono::{Duration, NaiveDate, NaiveDateTime, NaiveTime};
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 

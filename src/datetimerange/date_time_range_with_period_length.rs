@@ -1,7 +1,7 @@
-use chrono::{NaiveDateTime, Duration, Timelike};
+use crate::datetimerange::DateTimeRange;
+use chrono::{Duration, NaiveDateTime, Timelike};
 use std::hash::{Hash, Hasher};
 use std::iter::Iterator;
-use crate::datetimerange::DateTimeRange;
 
 const MINUTES_PER_HOUR: i32 = 60;
 const MINUTES_PER_DAY: i32 = 1440;

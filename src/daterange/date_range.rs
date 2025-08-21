@@ -75,6 +75,14 @@ impl DateRange {
         self.len
     }
 
+    /// Get an iterator over the dates in the range.
+    pub fn iter(&self) -> DateRangeIter {
+        DateRangeIter {
+            current: self.start_date,
+            end: self.end_date,
+        }
+    }
+
     /// Get the optional start day of the range.
     pub fn start_day(&self) -> Option<usize> {
         self.start_day
@@ -294,5 +302,24 @@ impl PartialOrd for DateRange {
 impl Ord for DateRange {
     fn cmp(&self, other: &Self) -> Ordering {
         self.start_date.cmp(&other.start_date)
+    }
+}
+
+pub struct DateRangeIter {
+    current: NaiveDate,
+    end: NaiveDate,
+}
+
+impl Iterator for DateRangeIter {
+    type Item = NaiveDate;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current > self.end {
+            None
+        } else {
+            let result = self.current;
+            self.current += Duration::days(1);
+            Some(result)
+        }
     }
 }
